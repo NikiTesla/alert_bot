@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  alert_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2704:2704"
+    restart: unless-stopped
+    networks:
+      - backend
+
+networks:
+  backend:

@@ -31,8 +31,8 @@ func (s *Service) Start() error {
 func (s *Service) initRouter() error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /", s.indexPost)
-	mux.HandleFunc("GET /", s.indexGet)
+	mux.HandleFunc("POST /result", s.indexPost)
+	mux.HandleFunc("GET /result", s.indexGet)
 
 	servicePort := ":2704"
 	log.Infof("Service is listening on port %s", servicePort)

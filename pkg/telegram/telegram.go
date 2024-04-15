@@ -9,7 +9,8 @@ import (
 )
 
 type Bot struct {
-	bot *tgbotapi.BotAPI
+	bot     *tgbotapi.BotAPI
+	storage Storage
 }
 
 func NewBot() *Bot {
@@ -25,7 +26,8 @@ func NewBot() *Bot {
 	bot.Debug = true
 
 	return &Bot{
-		bot: bot,
+		storage: NewMemoryStorage(),
+		bot:     bot,
 	}
 }
 

@@ -8,5 +8,6 @@ require github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 
 require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
+	github.com/joho/godotenv v1.5.1
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )
