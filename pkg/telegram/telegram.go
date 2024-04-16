@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"alert_bot/pkg/storage"
 	"fmt"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 
 type Bot struct {
 	bot     *tgbotapi.BotAPI
-	storage Storage
+	storage storage.Storage
 }
 
 func NewBot() *Bot {
@@ -26,7 +27,7 @@ func NewBot() *Bot {
 	bot.Debug = true
 
 	return &Bot{
-		storage: NewMemoryStorage(),
+		storage: storage.New(),
 		bot:     bot,
 	}
 }

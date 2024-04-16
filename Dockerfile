@@ -9,7 +9,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o alert_bot  ./cmd/*.go
 
-EXPOSE 2704
+EXPOSE 7010
 
 # Run
 CMD ["./alert_bot"]

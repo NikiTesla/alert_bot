@@ -2,8 +2,10 @@ package service
 
 import (
 	"alert_bot/pkg/telegram"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -34,7 +36,7 @@ func (s *Service) initRouter() error {
 	mux.HandleFunc("POST /result", s.indexPost)
 	mux.HandleFunc("GET /result", s.indexGet)
 
-	servicePort := ":2704"
+	servicePort := fmt.Sprintf(":%s", os.Getenv("SERVICE_PORT"))
 	log.Infof("Service is listening on port %s", servicePort)
 
 	return http.ListenAndServe(servicePort, mux)

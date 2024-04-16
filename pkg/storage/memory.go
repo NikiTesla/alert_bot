@@ -1,10 +1,4 @@
-package telegram
-
-type Storage interface {
-	Subscribe(chatId int64) error
-	Unsubscribe(chatId int64) error
-	GetSubscribersUids() ([]int64, error)
-}
+package storage
 
 type MemoryStorage struct {
 	db map[int64]string
