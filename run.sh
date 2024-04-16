@@ -8,9 +8,6 @@ echo "articdem $ARCTICDEM_DIR"
 echo "foundation $FOUNDATION_DIR"
 echo "sovietdem $SOVIETDEM_DIR"
 
-export HOST=89.207.223.31
-export PORT=7010
-
 foundation_file=$(find $FOUNDATION_DIR -maxdepth 2 -type f -iregex ".*/basSETSM.*/SETSM.*dem.tif")
 articdem_files=$(find $ARCTICDEM_DIR -maxdepth 2 -type f -iregex ".*/SETSM.*/SETSM.*dem.tif")
 sovietdem_file=$(find $SOVIETDEM_DIR -maxdepth 1 -type f -iregex ".*.tif")
