@@ -4,10 +4,9 @@ import (
 	"alert_bot/pkg/telegram"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
-	"path"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -15,15 +14,14 @@ import (
 type Service struct {
 	bot *telegram.Bot
 
-	imageDir    string
-	imagesSaved int
+	imageDir string
 }
 
 func New() *Service {
 	imageDir := os.Getenv("IMAGES_DIR")
 	if imageDir == "" {
-		log.Warn("IMAGES_DIR env is empty, using ./")
-		imageDir = "./"
+		log.Warn("IMAGES_DIR env is empty, using ./images")
+		imageDir = "./images"
 	}
 
 	if err := os.MkdirAll(imageDir, os.ModePerm); err != nil {
@@ -45,6 +43,13 @@ func (s *Service) Start() error {
 		}
 	}()
 
+	go func() {
+		ticker := time.NewTicker(time.Hour)
+		for range ticker.C {
+			s.cleanData()
+		}
+	}()
+
 	return s.bot.Start()
 }
 
@@ -61,54 +66,19 @@ func (s *Service) initRouter() error {
 	return http.ListenAndServe(servicePort, mux)
 }
 
-func (s *Service) indexPost(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
+func (s *Service) cleanData() error {
+	dirEntry, err := os.ReadDir(s.imageDir)
 	if err != nil {
-		http.Error(w, "Cannot read request's body", http.StatusBadRequest)
-		return
+		return fmt.Errorf("cannot read dir, err: %w", err)
 	}
 
-	if err := s.bot.NotifySubscribers(body); err != nil {
-		http.Error(w, "Cannot notify subscribers", http.StatusInternalServerError)
-		log.WithError(err).Error("cannot notify subscribers")
-		return
-	}
-}
-
-func (s *Service) imagePost(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	file, fileHeader, err := r.FormFile("image")
-	if err != nil {
-		http.Error(w, "Cannot read image from form. Did you send image in multipart form?", http.StatusBadRequest)
-		log.WithError(err).Error("Cannot read image from form")
-		return
-	}
-	defer file.Close()
-
-	imageData, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Could not read image data", http.StatusInternalServerError)
-		log.WithError(err).Error("Could not read image data")
-		return
+	for _, file := range dirEntry {
+		if err := os.Remove(file.Name()); err != nil {
+			log.WithError(err).Errorf("cannot remove file %s", file.Name())
+		}
 	}
 
-	imageName := path.Join(s.imageDir, fileHeader.Filename)
-	if err := os.WriteFile(imageName, imageData, 0666); err != nil {
-		http.Error(w, "Cannot save image", http.StatusInternalServerError)
-		log.WithError(err).Error("Cannot save image")
-		return
-	}
-
-	if err := s.bot.NotifySubscribersWithImage(imageName); err != nil {
-		http.Error(w, "Cannot notify subscribers with image", http.StatusInternalServerError)
-		log.WithError(err).Error("cannot notify subscribers with image")
-		return
-	}
-}
-
-func (s *Service) indexGet(w http.ResponseWriter, r *http.Request) {
-	log.Info("get request was served")
+	return nil
 }
 
 func (s *Service) Close() {

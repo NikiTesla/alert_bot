@@ -10,7 +10,6 @@ services:
     restart: unless-stopped
     networks:
       - backend
-
   # redis:
   #   image: redis:latest
   #   restart: always
