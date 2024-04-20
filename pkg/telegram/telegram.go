@@ -47,10 +47,18 @@ func (b *Bot) Start() error {
 	return nil
 }
 
-func (b *Bot) NotifySubscribers(data []byte) {
+func (b *Bot) NotifySubscribers(data []byte) error {
 	if err := b.notifySubscribers(data); err != nil {
-		log.WithError(err).Error("cannot notify subscribers")
+		return fmt.Errorf("cannot notify subscribers, err: %w", err)
 	}
+	return nil
+}
+
+func (b *Bot) NotifySubscribersWithImage(imageFilename string) error {
+	if err := b.notifySubscribersWithImage(imageFilename); err != nil {
+		return fmt.Errorf("cannot notify subscribers, err: %w", err)
+	}
+	return nil
 }
 
 func (b *Bot) Close() {

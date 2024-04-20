@@ -25,3 +25,22 @@ func (b *Bot) notifySubscribers(data []byte) error {
 
 	return nil
 }
+
+func (b *Bot) notifySubscribersWithImage(imageFilename string) error {
+	subscribersUids, err := b.storage.GetSubscribersUids()
+	if err != nil {
+		return fmt.Errorf("cannot get subscribers' uids, err: %w", err)
+	}
+
+	var msg tgbotapi.PhotoConfig
+	for _, subscriberUid := range subscribersUids {
+		msg = tgbotapi.NewPhotoUpload(subscriberUid, imageFilename)
+
+		if _, err := b.bot.Send(msg); err != nil {
+			return fmt.Errorf("cannot send message to chatId %d, err: %w", subscriberUid, err)
+		}
+	}
+	log.Infof("subscribers was notified about: %s", imageFilename)
+
+	return nil
+}
