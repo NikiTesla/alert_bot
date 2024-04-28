@@ -53,7 +53,7 @@ func (s *Service) initRouter() error {
 
 	mux.HandleFunc("POST /result", s.indexPost)
 	mux.HandleFunc("POST /image", s.imagePost)
-	mux.HandleFunc("GET /result", s.indexGet)
+	mux.HandleFunc("GET /healthz", s.healthz)
 
 	servicePort := fmt.Sprintf(":%s", os.Getenv("SERVICE_PORT"))
 	log.Infof("Service is listening on port %s", servicePort)
@@ -107,8 +107,8 @@ func (s *Service) imagePost(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Service) indexGet(w http.ResponseWriter, r *http.Request) {
-	log.Info("get request was served")
+func (s *Service) healthz(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK!"))
 }
 
 func (s *Service) Close() {
