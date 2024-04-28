@@ -10,18 +10,17 @@ services:
     restart: unless-stopped
     networks:
       - backend
-
-  redis:
-    image: redis:latest
-    restart: always
-    ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
-    volumes:
-      - ./dаta:/root/redis
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_PORT=${REDIS_PORT}
+  # redis:
+  #   image: redis:latest
+  #   restart: always
+  #   ports:
+  #     - "${REDIS_PORT}:${REDIS_PORT}"
+  #   volumes:
+  #     - ./dаta:/root/redis
+  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+  #   environment:
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_PORT=${REDIS_PORT}
 
 networks:
   backend:

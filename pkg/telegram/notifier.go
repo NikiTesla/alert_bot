@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	log "github.com/sirupsen/logrus"
 )
 
 func (b *Bot) notifySubscribers(data []byte) error {
@@ -21,7 +20,6 @@ func (b *Bot) notifySubscribers(data []byte) error {
 			return fmt.Errorf("cannot send message to chatId %d, err: %w", subscriberUid, err)
 		}
 	}
-	log.Infof("subscribers was notified about: %s", string(data))
 
 	return nil
 }
@@ -40,7 +38,6 @@ func (b *Bot) notifySubscribersWithImage(imageFilename string) error {
 			return fmt.Errorf("cannot send message to chatId %d, err: %w", subscriberUid, err)
 		}
 	}
-	log.Infof("subscribers was notified about: %s", imageFilename)
 
 	return nil
 }
