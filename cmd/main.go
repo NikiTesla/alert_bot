@@ -9,7 +9,10 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load(path.Join("./", ".env"))
+	if err := godotenv.Load(path.Join("./", ".env")); err != nil {
+		log.WithError(err).Warn("failed to load .env")
+	}
+
 	service := service.New()
 
 	if err := service.Start(); err != nil {

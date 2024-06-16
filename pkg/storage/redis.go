@@ -32,23 +32,13 @@ func NewRedis() *Redis {
 }
 
 func (r *Redis) Subscribe(chatId int64) error {
-	// r.db[chatId] = ""
-
 	return nil
 }
 
 func (r *Redis) Unsubscribe(chatId int64) error {
-	// delete(r.db, chatId)
-
 	return nil
 }
 
 func (r *Redis) GetSubscribersUids() ([]int64, error) {
-	var uids []int64
-
-	// for uid := range r.db {
-	// 	uids = append(uids, uid)
-	// }
-
-	return uids, nil
+	return nil, nil
 }
