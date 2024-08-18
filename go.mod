@@ -14,5 +14,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.5.1
+	golang.org/x/sync v0.8.0
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )

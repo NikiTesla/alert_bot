@@ -2,6 +2,8 @@ package main
 
 import (
 	"alert_bot/pkg/service"
+	"context"
+	"os"
 	"path"
 
 	"github.com/joho/godotenv"
@@ -13,9 +15,17 @@ func main() {
 		log.WithError(err).Warn("failed to load .env")
 	}
 
-	service := service.New()
+	service := service.New(createLogger())
 
-	if err := service.Start(); err != nil {
+	if err := service.Start(context.Background()); err != nil {
 		log.WithError(err).Fatal("service failed")
 	}
+}
+
+func createLogger() *log.Entry {
+	logger := log.NewEntry(log.StandardLogger())
+	if os.Getenv("DEBUG") == "true" {
+		logger.Logger.SetLevel(log.DebugLevel)
+	}
+	return logger
 }

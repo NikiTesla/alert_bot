@@ -2,6 +2,7 @@ package service
 
 import (
 	"alert_bot/pkg/telegram"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,15 +10,18 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 )
 
 type Service struct {
 	bot *telegram.Bot
 
 	imageDir string
+
+	logger *log.Entry
 }
 
-func New() *Service {
+func New(logger *log.Entry) *Service {
 	imageDir := os.Getenv("IMAGES_DIR")
 	if imageDir == "" {
 		log.Warn("IMAGES_DIR env is empty, using ./images")
@@ -31,26 +35,35 @@ func New() *Service {
 	}
 
 	return &Service{
-		bot:      telegram.NewBot(),
+		bot:      telegram.NewBot(logger),
 		imageDir: imageDir,
+		logger:   logger.WithField("type", "service"),
 	}
 }
 
-func (s *Service) Start() error {
-	go func() {
-		if err := s.initRouter(); err != nil {
-			log.WithError(err).Fatal("router has failed")
-		}
-	}()
+func (s *Service) Start(ctx context.Context) error {
+	eg, ctx := errgroup.WithContext(ctx)
 
-	go func() {
+	eg.Go(func() error {
 		ticker := time.NewTicker(time.Hour)
-		for range ticker.C {
-			s.cleanData()
-		}
-	}()
+		defer ticker.Stop()
 
-	return s.bot.Start()
+		for {
+			select {
+			case <-ticker.C:
+				if err := s.cleanData(); err != nil {
+					return err
+				}
+			case <-ctx.Done():
+				return nil
+			}
+		}
+	})
+
+	eg.Go(s.initRouter)
+	eg.Go(s.bot.Start)
+
+	return eg.Wait()
 }
 
 func (s *Service) initRouter() error {
@@ -65,7 +78,7 @@ func (s *Service) initRouter() error {
 		return fmt.Errorf("you should speciy port with SERVICE_PORT env")
 	}
 
-	log.Infof("Service is listening on port %s", servicePort)
+	s.logger.Infof("Service is listening on port %s", servicePort)
 
 	return http.ListenAndServe(servicePort, mux)
 }
@@ -78,7 +91,7 @@ func (s *Service) cleanData() error {
 
 	for _, file := range dirEntry {
 		if err := os.Remove(file.Name()); err != nil {
-			log.WithError(err).Errorf("cannot remove file %s", file.Name())
+			s.logger.WithError(err).Errorf("cannot remove file %s", file.Name())
 		}
 	}
 
@@ -86,5 +99,5 @@ func (s *Service) cleanData() error {
 }
 
 func (s *Service) Close() {
-	log.Info("service was closed")
+	s.logger.Info("service was closed")
 }

@@ -12,9 +12,10 @@ import (
 type Bot struct {
 	bot     *tgbotapi.BotAPI
 	storage storage.Storage
+	logger  *log.Entry
 }
 
-func NewBot() *Bot {
+func NewBot(logger *log.Entry) *Bot {
 	botToken, ok := os.LookupEnv("TELEBOT_API")
 	if !ok {
 		log.Fatal("bot token is not presented")
@@ -24,11 +25,14 @@ func NewBot() *Bot {
 	if err != nil {
 		log.WithError(err).Fatal("can't create Bot API")
 	}
-	bot.Debug = true
+	if os.Getenv("DEBUG") == "true" {
+		bot.Debug = true
+	}
 
 	return &Bot{
 		storage: storage.New(),
 		bot:     bot,
+		logger:  log.WithField("type", "telegram-bot"),
 	}
 }
 
