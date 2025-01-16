@@ -38,7 +38,7 @@ func (mS *MemoryStorage) GetSubscribersUids() ([]int64, error) {
 	mS.mx.RLock()
 	defer mS.mx.RUnlock()
 
-	uids := make([]int64, len(mS.chatIdToStatusDb))
+	uids := make([]int64, 0, len(mS.chatIdToStatusDb))
 	for uid := range mS.chatIdToStatusDb {
 		uids = append(uids, uid)
 	}

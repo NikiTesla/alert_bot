@@ -24,13 +24,13 @@ type Service struct {
 func New(logger *log.Entry) *Service {
 	imageDir := os.Getenv("IMAGES_DIR")
 	if imageDir == "" {
-		log.Warn("IMAGES_DIR env is empty, using ./images")
+		logger.Warn("IMAGES_DIR env is empty, using ./images")
 		imageDir = "./images"
 	}
 
 	if err := os.MkdirAll(imageDir, os.ModePerm); err != nil {
 		if !errors.Is(err, os.ErrExist) {
-			log.WithError(err).Fatalf("could not create dir %s", imageDir)
+			logger.WithError(err).Fatalf("could not create dir %s", imageDir)
 		}
 	}
 

@@ -7,9 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o alert_bot  ./cmd/*.go
-
-EXPOSE 7010
+RUN GOOS=linux go build -o alert_bot  ./cmd/*.go
 
 # Run
 CMD ["./alert_bot"]

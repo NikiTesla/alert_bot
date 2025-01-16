@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,21 +18,26 @@ type Bot struct {
 func NewBot(logger *log.Entry) *Bot {
 	botToken, ok := os.LookupEnv("TELEBOT_API")
 	if !ok {
-		log.Fatal("bot token is not presented")
+		logger.Fatal("bot token is not presented")
 	}
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
-		log.WithError(err).Fatal("can't create Bot API")
+		logger.WithError(err).Fatal("can't create Bot API")
 	}
 	if os.Getenv("DEBUG") == "true" {
 		bot.Debug = true
 	}
 
+	storage, err := storage.New()
+	if err != nil {
+		logger.WithError(err).Fatal("failed to create storage")
+	}
+
 	return &Bot{
-		storage: storage.New(),
+		storage: storage,
 		bot:     bot,
-		logger:  log.WithField("type", "telegram-bot"),
+		logger:  logger.WithField("type", "telegram-bot"),
 	}
 }
 
@@ -40,13 +45,8 @@ func (b *Bot) Start() error {
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 60
 
-	updateChannel, err := b.bot.GetUpdatesChan(updateConfig)
-	if err != nil {
-		return fmt.Errorf("cannot create update channel, err: %w", err)
-	}
-
 	log.Info("Bot is handling updates")
-	b.handleUpdates(updateChannel)
+	b.handleUpdates(b.bot.GetUpdatesChan(updateConfig))
 
 	return nil
 }

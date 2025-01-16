@@ -3,7 +3,7 @@ package telegram
 import (
 	"fmt"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func (b *Bot) notifySubscribers(data []byte) error {
@@ -32,7 +32,7 @@ func (b *Bot) notifySubscribersWithImage(imageFilename string) error {
 
 	var msg tgbotapi.PhotoConfig
 	for _, subscriberUid := range subscribersUids {
-		msg = tgbotapi.NewPhotoUpload(subscriberUid, imageFilename)
+		msg = tgbotapi.NewPhoto(subscriberUid, tgbotapi.FilePath(imageFilename))
 
 		if _, err := b.bot.Send(msg); err != nil {
 			return fmt.Errorf("cannot send message to chatId %d, err: %w", subscriberUid, err)

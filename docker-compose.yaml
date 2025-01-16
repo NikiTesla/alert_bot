@@ -1,7 +1,6 @@
-version: '3'
-
 services:
   alert_bot:
+    container_name: alert_bot
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,18 +8,7 @@ services:
       - "${SERVICE_PORT}:${SERVICE_PORT}"
     restart: unless-stopped
     networks:
-      - backend
-  # redis:
-  #   image: redis:latest
-  #   restart: always
-  #   ports:
-  #     - "${REDIS_PORT}:${REDIS_PORT}"
-  #   volumes:
-  #     - ./dаta:/root/redis
-  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
-  #   environment:
-  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
-  #     - REDIS_PORT=${REDIS_PORT}
+      - alertbot
 
 networks:
-  backend:
+  alertbot:

@@ -1,6 +1,10 @@
 package storage
 
-import "alert_bot/pkg/model"
+import (
+	"alert_bot/pkg/model"
+	"fmt"
+	"os"
+)
 
 type Storage interface {
 	Subscribe(chatId int64) error
@@ -10,6 +14,14 @@ type Storage interface {
 	GetStatus(chatId int64) (model.Status, error)
 }
 
-func New() Storage {
-	return NewMemoryStorage()
+func New() (Storage, error) {
+	if os.Getenv("IN_MEMORY") == "true" {
+		return NewMemoryStorage(), nil
+	}
+
+	storage, err := NewSQLiteStorage(sqliteStorageFilename)
+	if err != nil {
+		return nil, fmt.Errorf("creating sqlte storage, err: %w", err)
+	}
+	return storage, nil
 }

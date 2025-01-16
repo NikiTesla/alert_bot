@@ -1,22 +1,25 @@
 package telegram
 
 import (
+	"alert_bot/pkg/domain"
 	"alert_bot/pkg/errs"
 	"alert_bot/pkg/model"
+	"context"
 	"errors"
 	"fmt"
 	"strings"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	subscribeCommand   = "subscribe"
-	unsubscribeCommand = "unsubscribe"
-	sendDataCommand    = "send_data"
-	subscriptionCheck  = "check_subscription"
-	healthCommand      = "healthz"
+	startCommand             = "start"
+	subscribeCommand         = "subscribe"
+	unsubscribeCommand       = "unsubscribe"
+	sendDataCommand          = "send_data"
+	subscriptionCheckCommand = "check_subscription"
+	healthCommand            = "healthz"
 
 	welcomeMessage = "Hello! You can subscribe and get updates here for something interesting 🙃"
 	errorReponse   = "Error occured. Try one more time or write @krechetov_n and ask him to fix it 🤕"
@@ -42,6 +45,9 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) {
 	logger := b.logger.WithField("chatId", chatId).WithField("command", message.Command())
 
 	switch message.Command() {
+	case startCommand:
+		b.handleStart(message)
+
 	case subscribeCommand:
 		response := "You were successfully subscribed to updates"
 		if err := b.subscribe(chatId); err != nil {
@@ -64,7 +70,7 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) {
 			logger.WithError(err).Error("unable to send response")
 		}
 
-	case subscriptionCheck:
+	case subscriptionCheckCommand:
 		response := "You are not subscribed"
 		ok, err := b.checkSubscription(chatId)
 		if err != nil {
@@ -106,6 +112,9 @@ func (b *Bot) handleStart(message *tgbotapi.Message) {
 	chatId := message.Chat.ID
 	if _, err := b.bot.Send(tgbotapi.NewMessage(chatId, welcomeMessage)); err != nil {
 		b.logger.WithField("chatId", chatId).WithError(err).Error("unable to send start message")
+	}
+	if err := b.setCommands(context.TODO(), message.Chat.ID, domain.UnknownRole); err != nil {
+		b.logger.WithField("chatId", chatId).WithError(err).Error("unable to set commands")
 	}
 }
 
