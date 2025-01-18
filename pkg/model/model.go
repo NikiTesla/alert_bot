@@ -1,7 +1,20 @@
 package model
 
-type Status string
+type Status int
 
-var (
-	SendingData = Status("SENDING_DATA")
+const (
+	UnkwownStatus Status = iota
+	DefaultStatus
+	SendingData
 )
+
+func (s Status) String() string {
+	switch s {
+	case DefaultStatus:
+		return "default"
+	case SendingData:
+		return "sending data"
+	default:
+		return "unknown"
+	}
+}

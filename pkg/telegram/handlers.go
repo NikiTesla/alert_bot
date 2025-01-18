@@ -170,7 +170,7 @@ func (b *Bot) sendData(message *tgbotapi.Message) {
 		return
 	}
 
-	if err := b.storage.Unsubscribe(message.Chat.ID); err != nil {
+	if err := b.storage.SetStatus(message.Chat.ID, model.DefaultStatus); err != nil {
 		log.WithError(err).WithField("chatId", message.Chat.ID).Error("failed to remove chat's status")
 		response = "Error occured. Youre next message should be considered as data sending. You should provide it once again"
 		return

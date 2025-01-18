@@ -9,6 +9,11 @@ services:
     restart: unless-stopped
     networks:
       - alertbot
+    volumes:
+      - alert_bot_data:/app/data
 
 networks:
   alertbot:
+
+volumes:
+  alert_bot_data:

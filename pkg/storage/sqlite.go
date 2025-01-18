@@ -10,7 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const sqliteStorageFilename = "db.sql"
+const sqliteStorageFilename = "./data/db.sql"
 
 type SQLiteStorage struct {
 	db *sql.DB
@@ -36,7 +36,7 @@ func connectSQLite(filename string) (*sql.DB, error) {
 	}
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS subscribers (
 		chat_id INTEGER PRIMARY KEY,
-		status TEXT
+		status INTEGER
 	)`)
 	if err != nil {
 		return nil, fmt.Errorf("create table: %w", err)

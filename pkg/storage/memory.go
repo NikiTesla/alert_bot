@@ -21,7 +21,7 @@ func NewMemoryStorage() *MemoryStorage {
 func (mS *MemoryStorage) Subscribe(chatId int64) error {
 	mS.mx.Lock()
 	defer mS.mx.Unlock()
-	mS.chatIdToStatusDb[chatId] = ""
+	mS.chatIdToStatusDb[chatId] = model.DefaultStatus
 
 	return nil
 }
@@ -59,7 +59,7 @@ func (mS *MemoryStorage) GetStatus(chatId int64) (model.Status, error) {
 	defer mS.mx.RUnlock()
 	status, ok := mS.chatIdToStatusDb[chatId]
 	if !ok {
-		return "", errs.ErrNotFound
+		return model.UnkwownStatus, errs.ErrNotFound
 	}
 	return status, nil
 }

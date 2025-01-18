@@ -1,4 +1,4 @@
-FROM golang:1.22
+FROM golang:1.23.1
 
 WORKDIR /app
 
@@ -7,7 +7,6 @@ RUN go mod download
 
 COPY . .
 
-RUN GOOS=linux go build -o alert_bot  ./cmd/*.go
+RUN go build -o alert_bot ./cmd/*.go
 
-# Run
 CMD ["./alert_bot"]

@@ -19,7 +19,11 @@ func New() (Storage, error) {
 		return NewMemoryStorage(), nil
 	}
 
-	storage, err := NewSQLiteStorage(sqliteStorageFilename)
+	storageFile := os.Getenv("DB_FILENAME")
+	if storageFile == "" {
+		storageFile = sqliteStorageFilename
+	}
+	storage, err := NewSQLiteStorage(storageFile)
 	if err != nil {
 		return nil, fmt.Errorf("creating sqlte storage, err: %w", err)
 	}
